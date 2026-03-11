@@ -19,19 +19,19 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "servo.h"
 #include "tim.h"
 #include "gpio.h"
 #include "sensor.h"
 #include "pid.h"
 #include "motor.h"
 #include "OLED.h"
-
+#include"motor.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 
 
-// 必须要有这个重定向函数，printf才能工作（假设你用的是USART1）
 
 /* USER CODE END Includes */
 
@@ -160,6 +160,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  Servo_Init();
   /* USER CODE BEGIN 2 */
 
   Motor_Init();
@@ -183,6 +184,8 @@ int main(void)
   //for test
 
   /* USER CODE END 2 */
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3); // 启动舵机1 (PB8)
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4); // 启动舵机2 (PB9)
   OLED_Clear();
   OLED_ShowString(0, 0,  "Track:", OLED_8X16);
   OLED_ShowString(0, 20, "PID:",   OLED_8X16);
@@ -198,6 +201,8 @@ int main(void)
      if (Sensor_Read_Avoid_L() == 0 && Sensor_Read_Avoid_R() == 0)
       {
           Execute_Avoidance();
+          Servo_SetAngle(TIM_CHANNEL_3, 90); // 让 PB8 的舵机转到 45.5 度
+Servo_SetAngle(TIM_CHANNEL_4, 135);  // 让 PB9 的舵机转到 135 度
           continue;
       }
 
